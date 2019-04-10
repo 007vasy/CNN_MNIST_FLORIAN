@@ -53,7 +53,7 @@ with tf.Graph().as_default():
     with sess.as_default():
         # Build the graph
         cnn = CNN(patch_size=FLAGS.patch_size, num_filters_fist_layer=FLAGS.num_filters_fist_layer,
-                  num_filters_second_layer=FLAGS.num_filters_second_layer, size_fully_connected_layer=FLAGS.size_fully_connected_layer)
+                  num_filters_second_layer=int(FLAGS.num_filters_second_layer), size_fully_connected_layer=int(FLAGS.size_fully_connected_layer))
 
         # Define Training procedure
         global_step = tf.Variable(0, name="global_step", trainable=False)
