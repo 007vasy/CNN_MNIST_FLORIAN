@@ -23,7 +23,8 @@ tf.flags.DEFINE_integer("checkpoint_every", 50, "Save model after this many step
 tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
 tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
 tf.flags.DEFINE_string("run_name", None, "Suffix for output directory. If None, a timestamp is used instead")
-
+# Keep probability for the dropout layer
+tf.flags.DEFINE_float("keep_prob", 1.0, "Keep probability (default: 1.0)")
 
 FLAGS = tf.flags.FLAGS
 # FLAGS._parse_flags() # Handling MAC -> Linux change
@@ -116,7 +117,8 @@ with tf.Graph().as_default():
                 """
             feed_dict = {
                 cnn.x: x_batch,
-                cnn.y_: y_batch
+                cnn.y_: y_batch,
+                # keep_prob : 1.0
             }
             time_stamp = datetime.datetime.now()
             _, step, summaries, loss, accuracy = sess.run(
@@ -135,8 +137,9 @@ with tf.Graph().as_default():
             Evaluates model on a dev set
             """
             feed_dict = {
-              cnn.x: x_batch,
-              cnn.y_: y_batch
+                cnn.x: x_batch,
+                cnn.y_: y_batch,
+                # keep_prob : 1.0
             }
             step, summaries, loss, accuracy = sess.run(
                 [global_step, dev_summary_op, cnn.cross_entropy, cnn.accuracy],

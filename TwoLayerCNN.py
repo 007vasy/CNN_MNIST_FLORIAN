@@ -4,7 +4,7 @@ import numpy as np
 
 class CNN(object):
     def __init__(self, patch_size, num_filters_fist_layer, num_filters_second_layer,
-                 size_fully_connected_layer, num_classes=10, image_size=784):
+                 size_fully_connected_layer, num_classes=10, image_size=784, keep_prob = tf.placeholder(tf.float32, 1.0)):
         # Placeholders for input of images, labels and dropout rate
         self.x = tf.placeholder(tf.float32, shape=[None, image_size])
         self.y_ = tf.placeholder(tf.float32, shape=[None, num_classes])
@@ -86,11 +86,13 @@ class CNN(object):
         # TODO: Add second conv layer here. Use the num_filters_second_layer parameter
 
         # TODO: Add dropout here
+        h_dropout1 = tf.nn.dropout(h_fc1, rate=1 - keep_prob)
+        # h_dropout1 = tf.nn.dropout(h_fc1, rate=tf.placeholder(tf.float32,  1.0))
 
         W_fc2 = weight_variable([size_fully_connected_layer, num_classes], "W_fc2")
         b_fc2 = bias_variable([num_classes], "b_fc2")
 
-        self.y = tf.nn.softmax(tf.matmul(h_fc1, W_fc2) + b_fc2)
+        self.y = tf.nn.softmax(tf.matmul(h_dropout1, W_fc2) + b_fc2)
 
         # TODO: Add regularizer here
 
