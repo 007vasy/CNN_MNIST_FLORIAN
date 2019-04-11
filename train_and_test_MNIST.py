@@ -15,7 +15,7 @@ tf.flags.DEFINE_integer("patch_size", 5, "Size of the filter (default: 5)")
 tf.flags.DEFINE_float("size_fully_connected_layer", 512, "Size of the fully connected layer (default: 1024)")
 # Training parameters
 tf.flags.DEFINE_integer("batch_size", 32, "Batch Size (default: 50)")
-tf.flags.DEFINE_integer("num_epochs", 20, "Number of training epochs (default: 2000)")
+tf.flags.DEFINE_integer("num_epochs", 200, "Number of training epochs (default: 2000)")
 # tf.flags.DEFINE_integer("num_epochs", 2000, "Number of training epochs (default: 2000)")
 tf.flags.DEFINE_integer("evaluate_every", 10, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 50, "Save model after this many steps (default: 100)")
@@ -118,6 +118,7 @@ with tf.Graph().as_default():
                 cnn.x: x_batch,
                 cnn.y_: y_batch
             }
+            time_stamp = datetime.datetime.now()
             _, step, summaries, loss, accuracy = sess.run(
                 [train_op, global_step, train_summary_op, cnn.cross_entropy, cnn.accuracy],
                 feed_dict)
@@ -125,6 +126,8 @@ with tf.Graph().as_default():
             print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
             train_summary_writer.add_summary(summaries, step)
             train_summary_writer.flush()
+
+            return datetime.datetime.now().microsecond - time_stamp.microsecond
 
 
         def dev_step(x_batch, y_batch, writer=None):
@@ -143,15 +146,19 @@ with tf.Graph().as_default():
             if writer:
                 writer.add_summary(summaries, step)
 
-
+        step_delta_time = []
         for i in range(FLAGS.num_epochs):
             batch = mnist.train.next_batch(FLAGS.batch_size)
-            train_step(batch[0], batch[1])
+            step_delta_time.append(train_step(batch[0], batch[1]))
             current_step = tf.train.global_step(sess, global_step)
             if current_step % FLAGS.evaluate_every == 0:
                 print("\nEvaluation:")
                 dev_step(mnist.validation.images, mnist.validation.labels, writer=dev_summary_writer)
                 print("")
+                print("---")
+                print("AVG step time is:{}".format(sum(step_delta_time)/len(step_delta_time)))
+                print("---")
+                step_delta_time = []
             if current_step % FLAGS.checkpoint_every == 0:
                 path = saver.save(sess, checkpoint_prefix, global_step=current_step)
                 print("Saved model checkpoint to {}\n".format(path))
