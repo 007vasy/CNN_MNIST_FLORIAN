@@ -15,7 +15,8 @@ tf.flags.DEFINE_integer("patch_size", 5, "Size of the filter (default: 5)")
 tf.flags.DEFINE_float("size_fully_connected_layer", 512, "Size of the fully connected layer (default: 1024)")
 # Training parameters
 tf.flags.DEFINE_integer("batch_size", 32, "Batch Size (default: 50)")
-tf.flags.DEFINE_integer("num_epochs", 2000, "Number of training epochs (default: 2000)")
+tf.flags.DEFINE_integer("num_epochs", 20, "Number of training epochs (default: 2000)")
+# tf.flags.DEFINE_integer("num_epochs", 2000, "Number of training epochs (default: 2000)")
 tf.flags.DEFINE_integer("evaluate_every", 10, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 50, "Save model after this many steps (default: 100)")
 # Misc Parameters
@@ -157,3 +158,6 @@ with tf.Graph().as_default():
 
         print("test accuracy %g"%cnn.accuracy.eval(feed_dict={
             cnn.x: mnist.test.images, cnn.y_: mnist.test.labels}))
+
+print(loss_summary)
+print(acc_summary)
