@@ -156,8 +156,10 @@ with tf.Graph().as_default():
                 dev_step(mnist.validation.images, mnist.validation.labels, writer=dev_summary_writer)
                 print("")
                 print("---")
-                print("AVG step time is:{}".format(sum(step_delta_time)/len(step_delta_time)))
+                print("AVG step time is: {} us".format(sum(step_delta_time)/len(step_delta_time)))
                 print("---")
+                print("")
+                print("")
                 step_delta_time = []
             if current_step % FLAGS.checkpoint_every == 0:
                 path = saver.save(sess, checkpoint_prefix, global_step=current_step)
