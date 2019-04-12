@@ -15,7 +15,7 @@ tf.flags.DEFINE_integer("patch_size", 5, "Size of the filter (default: 5)")
 tf.flags.DEFINE_float("size_fully_connected_layer", 512, "Size of the fully connected layer (default: 1024)")
 # Training parameters
 tf.flags.DEFINE_integer("batch_size", 32, "Batch Size (default: 50)")
-tf.flags.DEFINE_integer("num_epochs", 200, "Number of training epochs (default: 2000)")
+tf.flags.DEFINE_integer("num_epochs", 20, "Number of training epochs (default: 2000)")
 # tf.flags.DEFINE_integer("num_epochs", 2000, "Number of training epochs (default: 2000)")
 tf.flags.DEFINE_integer("evaluate_every", 10, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 50, "Save model after this many steps (default: 100)")
@@ -55,7 +55,7 @@ with tf.Graph().as_default():
     with sess.as_default():
         # Build the graph
         cnn = CNN(patch_size=FLAGS.patch_size, num_filters_fist_layer=FLAGS.num_filters_fist_layer,
-                  num_filters_second_layer=int(FLAGS.num_filters_second_layer), size_fully_connected_layer=int(FLAGS.size_fully_connected_layer))
+                  num_filters_second_layer=int(FLAGS.num_filters_second_layer), size_fully_connected_layer=int(FLAGS.size_fully_connected_layer), keep_prob=FLAGS.keep_prob)
 
         # Define Training procedure
         global_step = tf.Variable(0, name="global_step", trainable=False)
@@ -118,7 +118,6 @@ with tf.Graph().as_default():
             feed_dict = {
                 cnn.x: x_batch,
                 cnn.y_: y_batch,
-                # keep_prob : 1.0
             }
             time_stamp = datetime.datetime.now()
             _, step, summaries, loss, accuracy = sess.run(
@@ -139,7 +138,6 @@ with tf.Graph().as_default():
             feed_dict = {
                 cnn.x: x_batch,
                 cnn.y_: y_batch,
-                # keep_prob : 1.0
             }
             step, summaries, loss, accuracy = sess.run(
                 [global_step, dev_summary_op, cnn.cross_entropy, cnn.accuracy],
