@@ -24,7 +24,7 @@ tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device 
 tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
 tf.flags.DEFINE_string("run_name", None, "Suffix for output directory. If None, a timestamp is used instead")
 # Keep probability for the dropout layer
-tf.flags.DEFINE_float("keep_prob", 1.0, "Keep probability (default: 1.0)")
+# tf.flags.DEFINE_float("keep_prob", 1.0, "Keep probability (default: 1.0)")
 
 FLAGS = tf.flags.FLAGS
 # FLAGS._parse_flags() # Handling MAC -> Linux change
@@ -55,7 +55,7 @@ with tf.Graph().as_default():
     with sess.as_default():
         # Build the graph
         cnn = CNN(patch_size=FLAGS.patch_size, num_filters_fist_layer=FLAGS.num_filters_fist_layer,
-                  num_filters_second_layer=int(FLAGS.num_filters_second_layer), size_fully_connected_layer=int(FLAGS.size_fully_connected_layer), keep_prob=FLAGS.keep_prob)
+                  num_filters_second_layer=int(FLAGS.num_filters_second_layer), size_fully_connected_layer=int(FLAGS.size_fully_connected_layer))
 
         # Define Training procedure
         global_step = tf.Variable(0, name="global_step", trainable=False)
@@ -118,7 +118,9 @@ with tf.Graph().as_default():
             feed_dict = {
                 cnn.x: x_batch,
                 cnn.y_: y_batch,
+                cnn.keep_prob : 0.5
             }
+
             time_stamp = datetime.datetime.now()
             _, step, summaries, loss, accuracy = sess.run(
                 [train_op, global_step, train_summary_op, cnn.cross_entropy, cnn.accuracy],
@@ -138,6 +140,7 @@ with tf.Graph().as_default():
             feed_dict = {
                 cnn.x: x_batch,
                 cnn.y_: y_batch,
+                cnn.keep_prob: 1.0
             }
             step, summaries, loss, accuracy = sess.run(
                 [global_step, dev_summary_op, cnn.cross_entropy, cnn.accuracy],

@@ -4,11 +4,11 @@ import numpy as np
 
 class CNN(object):
     def __init__(self, patch_size, num_filters_fist_layer, num_filters_second_layer,
-                 size_fully_connected_layer, num_classes=10, image_size=784, keep_prob = tf.placeholder(tf.float32, name="keep_prob")):
+                 size_fully_connected_layer, num_classes=10, image_size=784, ):
         # Placeholders for input of images, labels and dropout rate
         self.x = tf.placeholder(tf.float32, shape=[None, image_size])
         self.y_ = tf.placeholder(tf.float32, shape=[None, num_classes])
-
+        self.keep_prob = tf.placeholder_with_default(1.0, shape=())
         # creates and returns a weight variable with given shape initialized with
         # a truncated normal distribution with stddev of 0.1
         def weight_variable(shape, nameVar):
@@ -91,7 +91,7 @@ class CNN(object):
             return tf.nn.dropout(x, rate=1 - keep_prob)
 
         # h_dropout1 = tf.nn.dropout(h_fc1, rate=1 - keep_prob)
-        h_dropout1 = dropout_layer(h_fc1, keep_prob)
+        h_dropout1 = dropout_layer(h_fc1, self.keep_prob)
 
         W_fc2 = weight_variable([size_fully_connected_layer, num_classes], "W_fc2")
         b_fc2 = bias_variable([num_classes], "b_fc2")
