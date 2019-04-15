@@ -84,6 +84,7 @@ with tf.Graph().as_default():
         # Summaries for loss and accuracy
         loss_summary = tf.summary.scalar("loss", cnn.cross_entropy)
         acc_summary = tf.summary.scalar("accuracy", cnn.accuracy)
+        reg_summary = tf.summary.scalar("regularize", cnn.reg)
         # Since we have many channels, we will get filters only for one channel
         V = tf.slice(cnn.W_conv1, (0, 0, 0, 0), (-1, -1, -1, 1))
         # Bring into shape expected by image_summary
@@ -91,7 +92,7 @@ with tf.Graph().as_default():
         image_summary_op = tf.summary.image("kernel_layer1", V, 5)
         # TODO: Add a summary for visualizing the filters from the second layer
         # Train Summaries
-        train_summary_op = tf.summary.merge([loss_summary, acc_summary, image_summary_op, grad_summaries_merged])
+        train_summary_op = tf.summary.merge([loss_summary, acc_summary, reg_summary, image_summary_op, grad_summaries_merged])
         train_summary_dir = os.path.join(out_dir, "summaries", "train")
         train_summary_writer = tf.summary.FileWriter(train_summary_dir, sess.graph)
 
@@ -118,7 +119,8 @@ with tf.Graph().as_default():
             feed_dict = {
                 cnn.x: x_batch,
                 cnn.y_: y_batch,
-                cnn.keep_prob : 0.5
+                cnn.keep_prob: 0.8,
+                cnn.lamb: 1.0
             }
 
             time_stamp = datetime.datetime.now()
@@ -128,6 +130,7 @@ with tf.Graph().as_default():
             time_str = datetime.datetime.now().isoformat()
             print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
             train_summary_writer.add_summary(summaries, step)
+            # train_summary_writer.add_summary(datetime.datetime.now().microsecond - time_stamp.microsecond,step)
             train_summary_writer.flush()
 
             return datetime.datetime.now().microsecond - time_stamp.microsecond

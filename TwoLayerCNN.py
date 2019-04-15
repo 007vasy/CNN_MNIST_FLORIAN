@@ -9,6 +9,7 @@ class CNN(object):
         self.x = tf.placeholder(tf.float32, shape=[None, image_size])
         self.y_ = tf.placeholder(tf.float32, shape=[None, num_classes])
         self.keep_prob = tf.placeholder_with_default(1.0, shape=())
+        self.lamb = tf.placeholder_with_default(1.0, shape=())
         # creates and returns a weight variable with given shape initialized with
         # a truncated normal distribution with stddev of 0.1
         def weight_variable(shape, nameVar):
@@ -85,7 +86,7 @@ class CNN(object):
 
         # TODO: Add second conv layer here. Use the num_filters_second_layer parameter
 
-        # TODO: Add dropout here
+        # TO DO: Add dropout here: DONE
         # Dropout function
         def dropout_layer(x, keep_prob):
             return tf.nn.dropout(x, rate=1 - keep_prob)
@@ -99,6 +100,7 @@ class CNN(object):
         self.y = tf.nn.softmax(tf.matmul(h_dropout1, W_fc2) + b_fc2)
 
         # TODO: Add regularizer here
+        self.reg = tf.math.pow(tf.nn.l2_loss(W_fc2), 2) - 1*(tf.math.pow(tf.nn.l2_loss(b_fc2), 2))
 
         self.cross_entropy = tf.reduce_mean(-tf.reduce_sum(self.y_ * tf.log(self.y), reduction_indices=[1]))
         self.correct_prediction = tf.equal(tf.argmax(self.y, 1), tf.argmax(self.y_, 1))
