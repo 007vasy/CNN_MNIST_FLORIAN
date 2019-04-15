@@ -120,7 +120,7 @@ with tf.Graph().as_default():
                 cnn.x: x_batch,
                 cnn.y_: y_batch,
                 cnn.keep_prob: 0.8,
-                cnn.lamb: 1.0
+                cnn.lamb: 0.8
             }
 
             time_stamp = datetime.datetime.now()

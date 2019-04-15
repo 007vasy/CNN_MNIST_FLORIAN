@@ -77,14 +77,22 @@ class CNN(object):
         h_pool1 = max_pool_2x2(h_conv1)
         # print h_pool1.get_shape() # the shape is [-1, 14, 14, 32]
 
+        # TODO: Add second conv layer here. Use the num_filters_second_layer parameter
+        W_conv2 = weight_variable([patch_size, patch_size, 32, num_filters_second_layer], "filter_layer2")
+        b_conv2 = bias_variable([num_filters_second_layer], "bias_layer2")
+
+        h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
+        h_pool2 = max_pool_2x2(h_conv2)
+
         # Create a densely connected layer with relu
         W_fc1 = weight_variable([14 * 14 * 32, size_fully_connected_layer], "W_fc1")
         b_fc1 = bias_variable([size_fully_connected_layer], "b_fc1")
-        h_pool1_flat = tf.reshape(h_pool1, [-1, 14 * 14 * 32])
+        h_pool2_flat = tf.reshape(h_pool2, [-1, 14 * 14 * 32])
         # the shape of h_fc1 is [-1, size_fully_connected_layer]
-        h_fc1 = tf.nn.relu(tf.matmul(h_pool1_flat, W_fc1) + b_fc1)
+        h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
         # TODO: Add second conv layer here. Use the num_filters_second_layer parameter
+        # Moved up to the right place
 
         # TO DO: Add dropout here: DONE
         # Dropout function
@@ -97,9 +105,10 @@ class CNN(object):
         W_fc2 = weight_variable([size_fully_connected_layer, num_classes], "W_fc2")
         b_fc2 = bias_variable([num_classes], "b_fc2")
 
+        # TODO insert regulazier
         self.y = tf.nn.softmax(tf.matmul(h_dropout1, W_fc2) + b_fc2)
 
-        # TODO: Add regularizer here
+        # TODO: Add regularizer here (not inserted)
         self.reg = tf.math.pow(tf.nn.l2_loss(W_fc2), 2) - 1*(tf.math.pow(tf.nn.l2_loss(b_fc2), 2))
 
         self.cross_entropy = tf.reduce_mean(-tf.reduce_sum(self.y_ * tf.log(self.y), reduction_indices=[1]))
